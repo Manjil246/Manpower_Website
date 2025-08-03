@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Eye, EyeOff } from "lucide-react"
+import { LOGO_URL } from "@/constants/constants"
 
 export default function AdminLoginPage() {
   const [credentials, setCredentials] = useState({ username: "", password: "" })
@@ -45,10 +46,17 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">NM</span>
+            <img
+              src={LOGO_URL}
+              alt="Nepal Manpower Company"
+              width={32}
+              height={32}
+            />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <p className="text-muted-foreground">Access the Nepal Manpower Company admin panel</p>
+          <p className="text-muted-foreground">
+            Access the Nepal Manpower Company admin panel
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -58,7 +66,12 @@ export default function AdminLoginPage() {
                 id="username"
                 type="text"
                 value={credentials.username}
-                onChange={(e) => setCredentials((prev) => ({ ...prev, username: e.target.value }))}
+                onChange={(e) =>
+                  setCredentials((prev) => ({
+                    ...prev,
+                    username: e.target.value,
+                  }))
+                }
                 required
                 placeholder="Enter your username"
               />
@@ -71,7 +84,12 @@ export default function AdminLoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={credentials.password}
-                  onChange={(e) => setCredentials((prev) => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) =>
+                    setCredentials((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
                   required
                   placeholder="Enter your password"
                 />
@@ -82,7 +100,11 @@ export default function AdminLoginPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -99,5 +121,5 @@ export default function AdminLoginPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

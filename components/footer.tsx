@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Facebook, Twitter, Instagram, Linkedin, Phone, Mail, MapPin } from "lucide-react"
+import { LOGO_URL } from "@/constants/constants"
 
 export function Footer() {
   const handleWhatsAppClick = () => {
@@ -20,48 +21,73 @@ export function Footer() {
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">NM</span>
+                <img
+                  src={LOGO_URL}
+                  alt="Nepal Manpower Company"
+                  width={32}
+                  height={32}
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-xl">Nepal Manpower</span>
-                <span className="text-xs text-slate-400">Foreign Employment</span>
+                <span className="text-xs text-slate-400">
+                  Foreign Employment
+                </span>
               </div>
             </div>
             <p className="text-slate-300 mb-4 leading-relaxed">
-              Leading manpower company in Nepal specializing in foreign employment opportunities with 10+ years of
-              experience.
+              Leading manpower company in Nepal specializing in foreign
+              employment opportunities with 10+ years of experience.
             </p>
             <p className="text-sm text-slate-400 font-medium">
-              License No: {process.env.NEXT_PUBLIC_COMPANY_LICENSE || "1234/2024/GON"}
+              License No:{" "}
+              {process.env.NEXT_PUBLIC_COMPANY_LICENSE || "1234/2024/GON"}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 text-slate-200">Quick Links</h3>
+            <h3 className="font-semibold text-lg mb-4 text-slate-200">
+              Quick Links
+            </h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/" className="text-slate-300 hover:text-white transition-colors duration-200">
+                <Link
+                  href="/"
+                  className="text-slate-300 hover:text-white transition-colors duration-200"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-slate-300 hover:text-white transition-colors duration-200">
+                <Link
+                  href="/about"
+                  className="text-slate-300 hover:text-white transition-colors duration-200"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/jobs" className="text-slate-300 hover:text-white transition-colors duration-200">
+                <Link
+                  href="/jobs"
+                  className="text-slate-300 hover:text-white transition-colors duration-200"
+                >
                   Jobs
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-slate-300 hover:text-white transition-colors duration-200">
+                <Link
+                  href="/contact"
+                  className="text-slate-300 hover:text-white transition-colors duration-200"
+                >
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-slate-300 hover:text-white transition-colors duration-200">
+                <Link
+                  href="/faq"
+                  className="text-slate-300 hover:text-white transition-colors duration-200"
+                >
                   FAQ
                 </Link>
               </li>
@@ -70,7 +96,9 @@ export function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 text-slate-200">Contact Info</h3>
+            <h3 className="font-semibold text-lg mb-4 text-slate-200">
+              Contact Info
+            </h3>
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-slate-400 flex-shrink-0" />
@@ -89,7 +117,9 @@ export function Footer() {
 
           {/* Social Media & WhatsApp */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 text-slate-200">Connect With Us</h3>
+            <h3 className="font-semibold text-lg mb-4 text-slate-200">
+              Connect With Us
+            </h3>
             <div className="flex space-x-3 mb-6">
               <Button
                 variant="outline"
@@ -131,11 +161,12 @@ export function Footer() {
 
         <div className="border-t border-slate-700 mt-8 pt-8 text-center">
           <p className="text-slate-400">
-            © {new Date().getFullYear()} {process.env.NEXT_PUBLIC_COMPANY_NAME || "Nepal Manpower Company"}. All rights
-            reserved.
+            © {new Date().getFullYear()}{" "}
+            {process.env.NEXT_PUBLIC_COMPANY_NAME || "Nepal Manpower Company"}.
+            All rights reserved.
           </p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

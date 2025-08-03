@@ -1,20 +1,26 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, DollarSign, Clock, ChevronLeft, ChevronRight } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { supabase, type Job } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  MapPin,
+  DollarSign,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { supabase, type Job } from "@/lib/supabase";
 
 export function FeaturedJobs() {
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -23,49 +29,66 @@ export function FeaturedJobs() {
         .select("*")
         .eq("status", "active")
         .order("created_at", { ascending: false })
-        .limit(6)
+        .limit(6);
 
       if (data && !error) {
-        setJobs(data)
+        setJobs(data);
       }
-      setLoading(false)
-    }
+      setLoading(false);
+    };
 
-    fetchJobs()
+    fetchJobs();
 
     // Real-time subscription
     const subscription = supabase
       .channel("featured_jobs_channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, (payload) => {
-        if (payload.eventType === "INSERT" && payload.new.status === "active") {
-          setJobs((prev) => [payload.new as Job, ...prev.slice(0, 5)])
-        } else if (payload.eventType === "UPDATE") {
-          setJobs((prev) => prev.map((job) => (job.id === payload.new.id ? (payload.new as Job) : job)))
-        } else if (payload.eventType === "DELETE") {
-          setJobs((prev) => prev.filter((job) => job.id !== payload.old.id))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "jobs" },
+        (payload) => {
+          if (
+            payload.eventType === "INSERT" &&
+            payload.new.status === "active"
+          ) {
+            setJobs((prev) => [payload.new as Job, ...prev.slice(0, 5)]);
+          } else if (payload.eventType === "UPDATE") {
+            setJobs((prev) =>
+              prev.map((job) =>
+                job.id === payload.new.id ? (payload.new as Job) : job
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setJobs((prev) => prev.filter((job) => job.id !== payload.old.id));
+          }
         }
-      })
-      .subscribe()
+      )
+      .subscribe();
 
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const nextJobs = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.max(1, jobs.length - 2))
-  }
+    setCurrentIndex((prev) => (prev + 1) % Math.max(1, jobs.length - 2));
+  };
 
   const prevJobs = () => {
-    setCurrentIndex((prev) => (prev - 1 + Math.max(1, jobs.length - 2)) % Math.max(1, jobs.length - 2))
-  }
+    setCurrentIndex(
+      (prev) =>
+        (prev - 1 + Math.max(1, jobs.length - 2)) % Math.max(1, jobs.length - 2)
+    );
+  };
 
   const handleWhatsAppContact = (job: Job) => {
-    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+9779876543210"
-    const message = `Hello! I'm interested in the ${job.title} position at ${job.company}. Can you provide more information?`
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
-  }
+    const phoneNumber =
+      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+9779876543210";
+    const message = `Hello! I'm interested in the ${job.title} position at ${job.company}. Can you provide more information?`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   if (loading) {
     return (
@@ -93,7 +116,7 @@ export function FeaturedJobs() {
           </div>
         </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -102,7 +125,8 @@ export function FeaturedJobs() {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Jobs</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover the latest job opportunities with competitive salaries and excellent benefits.
+            Discover the latest job opportunities with competitive salaries and
+            excellent benefits.
           </p>
         </div>
 
@@ -115,9 +139,11 @@ export function FeaturedJobs() {
                   className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
                   onClick={() => setSelectedJob(job)}
                 >
-                  <div className="relative h-48 overflow-hidden rounded-t-lg">
+                  <div className="relative h-96 overflow-hidden rounded-t-lg">
                     <Image
-                      src={job.image_url || "/placeholder.svg?height=200&width=300"}
+                      src={
+                        job.image_url || "/placeholder.svg?height=200&width=300"
+                      }
                       alt={job.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -171,7 +197,9 @@ export function FeaturedJobs() {
         ) : (
           <Card>
             <CardContent className="p-8 text-center">
-              <p className="text-muted-foreground">No featured jobs available at the moment.</p>
+              <p className="text-muted-foreground">
+                No featured jobs available at the moment.
+              </p>
             </CardContent>
           </Card>
         )}
@@ -210,8 +238,12 @@ export function FeaturedJobs() {
             <div className="p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold mb-2">{selectedJob.title}</h2>
-                  <p className="text-xl text-muted-foreground">{selectedJob.company}</p>
+                  <h2 className="text-3xl font-bold mb-2">
+                    {selectedJob.title}
+                  </h2>
+                  <p className="text-xl text-muted-foreground">
+                    {selectedJob.company}
+                  </p>
                 </div>
                 <Badge variant="outline" className="text-lg px-3 py-1">
                   {selectedJob.job_type}
@@ -223,43 +255,57 @@ export function FeaturedJobs() {
                   <MapPin className="h-5 w-5 mr-3 text-primary" />
                   <div>
                     <p className="font-medium">Location</p>
-                    <p className="text-muted-foreground">{selectedJob.location}</p>
+                    <p className="text-muted-foreground">
+                      {selectedJob.location}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <DollarSign className="h-5 w-5 mr-3 text-primary" />
                   <div>
                     <p className="font-medium">Salary</p>
-                    <p className="text-muted-foreground">{selectedJob.salary}</p>
+                    <p className="text-muted-foreground">
+                      {selectedJob.salary}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 mr-3 text-primary" />
                   <div>
                     <p className="font-medium">Type</p>
-                    <p className="text-muted-foreground">{selectedJob.job_type}</p>
+                    <p className="text-muted-foreground">
+                      {selectedJob.job_type}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Job Description</h3>
-                  <p className="text-muted-foreground mb-6">{selectedJob.description}</p>
+                  <h3 className="text-xl font-semibold mb-4">
+                    Job Description
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    {selectedJob.description}
+                  </p>
 
-                  {selectedJob.requirements && selectedJob.requirements.length > 0 && (
-                    <>
-                      <h4 className="font-semibold mb-3">Requirements:</h4>
-                      <ul className="space-y-2">
-                        {selectedJob.requirements.map((req, index) => (
-                          <li key={index} className="flex items-center text-sm">
-                            <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                            {req}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                  {selectedJob.requirements &&
+                    selectedJob.requirements.length > 0 && (
+                      <>
+                        <h4 className="font-semibold mb-3">Requirements:</h4>
+                        <ul className="space-y-2">
+                          {selectedJob.requirements.map((req, index) => (
+                            <li
+                              key={index}
+                              className="flex items-center text-sm"
+                            >
+                              <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                              {req}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
                 </div>
 
                 <div>
@@ -299,5 +345,5 @@ export function FeaturedJobs() {
         </div>
       )}
     </section>
-  )
+  );
 }

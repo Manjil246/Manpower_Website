@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,12 +18,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { Separator } from "@/components/ui/separator"
-import { Menu, Phone, Mail, MapPin } from "lucide-react"
+} from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
+import { Menu, Phone, Mail, MapPin } from "lucide-react";
+import { LOGO_URL } from "@/constants/constants";
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -25,25 +32,38 @@ export function Header() {
     { name: "Jobs", href: "/jobs" },
     { name: "Contact", href: "/contact" },
     { name: "FAQ", href: "/faq" },
-  ]
+  ];
 
   const handleWhatsAppClick = () => {
-    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+9779876543210"
-    const message = "Hello! I am interested in foreign employment opportunities."
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
-  }
+    const phoneNumber =
+      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+9779876543210";
+    const message =
+      "Hello! I am interested in foreign employment opportunities.";
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-3">
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-lg">NM</span>
+            <img
+              src={LOGO_URL}
+              alt="Nepal Manpower Company"
+              width={32}
+              height={32}
+            />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-xl text-foreground">Nepal Manpower</span>
-            <span className="text-xs text-muted-foreground font-medium">Foreign Employment</span>
+            <span className="font-bold text-xl text-foreground">
+              Nepal Manpower
+            </span>
+            <span className="text-xs text-muted-foreground font-medium">
+              Foreign Employment
+            </span>
           </div>
         </Link>
 
@@ -53,7 +73,9 @@ export function Header() {
             {navigation.map((item) => (
               <NavigationMenuItem key={item.name}>
                 <Link href={item.href} legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>{item.name}</NavigationMenuLink>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    {item.name}
+                  </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
             ))}
@@ -67,9 +89,12 @@ export function Header() {
                         className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                         href="/jobs"
                       >
-                        <div className="mb-2 mt-4 text-lg font-medium">Job Opportunities</div>
+                        <div className="mb-2 mt-4 text-lg font-medium">
+                          Job Opportunities
+                        </div>
                         <p className="text-sm leading-tight text-muted-foreground">
-                          Explore thousands of job opportunities across 15+ countries with competitive salaries.
+                          Explore thousands of job opportunities across 15+
+                          countries with competitive salaries.
                         </p>
                       </a>
                     </NavigationMenuLink>
@@ -80,9 +105,12 @@ export function Header() {
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         href="/about"
                       >
-                        <div className="text-sm font-medium leading-none">About Us</div>
+                        <div className="text-sm font-medium leading-none">
+                          About Us
+                        </div>
                         <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
-                          Learn about our 10+ years of experience in foreign employment.
+                          Learn about our 10+ years of experience in foreign
+                          employment.
                         </p>
                       </a>
                     </NavigationMenuLink>
@@ -91,9 +119,12 @@ export function Header() {
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         href="/contact"
                       >
-                        <div className="text-sm font-medium leading-none">Contact</div>
+                        <div className="text-sm font-medium leading-none">
+                          Contact
+                        </div>
                         <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
-                          Get in touch with our expert team for personalized assistance.
+                          Get in touch with our expert team for personalized
+                          assistance.
                         </p>
                       </a>
                     </NavigationMenuLink>
@@ -154,8 +185,8 @@ export function Header() {
 
                 <Button
                   onClick={() => {
-                    handleWhatsAppClick()
-                    setIsOpen(false)
+                    handleWhatsAppClick();
+                    setIsOpen(false);
                   }}
                   className="w-full mt-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white"
                 >
@@ -167,5 +198,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
