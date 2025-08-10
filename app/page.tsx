@@ -1,12 +1,12 @@
-import { Header } from "@/components/header"
-import { HeroSection } from "@/components/hero-section"
-import { WhoWeAre } from "@/components/who-we-are"
-import { JobCategories } from "@/components/job-categories"
-import { FeaturedJobs } from "@/components/featured-jobs"
-import { Testimonials } from "@/components/testimonials"
-import { StatsCounter } from "@/components/stats-counter"
-import { Footer } from "@/components/footer"
-import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Header } from "@/components/header";
+import { HeroSection } from "@/components/hero-section";
+import { WhoWeAre } from "@/components/who-we-are";
+import { JobCategories } from "@/components/job-categories";
+import { FeaturedJobs } from "@/components/featured-jobs";
+import { Testimonials } from "@/components/testimonials";
+import { StatsCounter } from "@/components/stats-counter";
+import { Footer } from "@/components/footer";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 export default function HomePage() {
   return (
@@ -17,11 +17,11 @@ export default function HomePage() {
         <WhoWeAre />
         <JobCategories />
         <FeaturedJobs />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <StatsCounter />
       </main>
       <Footer />
       <WhatsAppButton />
     </div>
-  )
+  );
 }

@@ -44,11 +44,11 @@ export default function JobsPage() {
         // Extract unique categories and locations
         const uniqueCategories = [
           "All",
-          ...new Set(data.map((job) => job.category)),
+          ...Array.from(new Set(data.map((job) => job.category))),
         ];
         const uniqueLocations = [
           "All",
-          ...new Set(data.map((job) => job.country)),
+          ...Array.from(new Set(data.map((job) => job.country))),
         ];
         setCategories(uniqueCategories);
         setLocations(uniqueLocations);
@@ -217,10 +217,10 @@ export default function JobsPage() {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" className="w-full bg-transparent">
+                {/* <Button variant="outline" className="w-full bg-transparent">
                   <Filter className="h-4 w-4 mr-2" />
                   More Filters
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>

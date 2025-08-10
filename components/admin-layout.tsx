@@ -1,31 +1,39 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { LayoutDashboard, Briefcase, FileText, Users, Settings, LogOut, Menu } from "lucide-react"
-import { LOGO_URL } from "@/constants/constants"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  Users,
+  Settings,
+  LogOut,
+  Menu,
+} from "lucide-react";
+import { LOGO_URL } from "@/constants/constants";
 
 const navigation = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  // { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Jobs", href: "/admin/jobs", icon: Briefcase },
-  { name: "Applications", href: "/admin/applications", icon: FileText },
-  { name: "Workers", href: "/admin/workers", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
-]
+  // { name: "Applications", href: "/admin/applications", icon: FileText },
+  // { name: "Workers", href: "/admin/workers", icon: Users },
+  // { name: "Settings", href: "/admin/settings", icon: Settings },
+];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleLogout = () => {
     // Handle logout logic
-    window.location.href = "/admin"
-  }
+    window.location.href = "/admin";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">

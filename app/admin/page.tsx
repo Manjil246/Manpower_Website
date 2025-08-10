@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { Eye, EyeOff } from "lucide-react"
-import { LOGO_URL } from "@/constants/constants"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
+import { LOGO_URL } from "@/constants/constants";
 
 export default function AdminLoginPage() {
-  const [credentials, setCredentials] = useState({ username: "", password: "" })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     // Simulate login process
     setTimeout(() => {
-      if (credentials.username === "admin" && credentials.password === "admin123") {
+      if (
+        credentials.username === "admin" &&
+        credentials.password === "admin123"
+      ) {
         toast({
           title: "Login Successful",
           description: "Welcome to the admin dashboard!",
-        })
+        });
         // Redirect to dashboard
-        window.location.href = "/admin/dashboard"
+        window.location.href = "/admin/jobs";
       } else {
         toast({
           title: "Login Failed",
           description: "Invalid username or password.",
           variant: "destructive",
-        })
+        });
       }
-      setIsLoading(false)
-    }, 1000)
-  }
+      setIsLoading(false);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center p-4">

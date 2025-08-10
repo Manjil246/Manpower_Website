@@ -1,26 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AdminLayout } from "@/components/admin-layout"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Edit, Trash2, Eye } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import Image from "next/image"
-import { useRealtimeJobs, useRealtimeJobCategories, createJob, updateJob, deleteJob, type Job } from "@/lib/supabase"
+import { useState } from "react";
+import { AdminLayout } from "@/components/admin-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import {
+  useRealtimeJobs,
+  useRealtimeJobCategories,
+  createJob,
+  updateJob,
+  deleteJob,
+  type Job,
+} from "@/lib/supabase";
+import { uploadFileToCloudinary } from "@/lib/upload_to_cloudinary";
 
 export default function AdminJobsPage() {
-  const { jobs, loading: jobsLoading } = useRealtimeJobs()
-  const { categories, loading: categoriesLoading } = useRealtimeJobCategories()
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingJob, setEditingJob] = useState<Job | null>(null)
+  const { jobs, loading: jobsLoading, refetch } = useRealtimeJobs();
+  const { categories, loading: categoriesLoading } = useRealtimeJobCategories();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
   const [newJob, setNewJob] = useState({
     title: "",
     company: "",
@@ -34,22 +55,22 @@ export default function AdminJobsPage() {
     requirements: [] as string[],
     benefits: [] as string[],
     image_url: "",
-  })
-  const { toast } = useToast()
+  });
+  const { toast } = useToast();
 
   const handleAddJob = async () => {
     const { error } = await createJob({
       ...newJob,
       requirements: newJob.requirements.filter((req) => req.trim() !== ""),
       benefits: newJob.benefits.filter((benefit) => benefit.trim() !== ""),
-    })
+    });
 
     if (error) {
       toast({
         title: "Error",
         description: "Failed to create job",
         variant: "destructive",
-      })
+      });
     } else {
       setNewJob({
         title: "",
@@ -64,17 +85,18 @@ export default function AdminJobsPage() {
         requirements: [],
         benefits: [],
         image_url: "",
-      })
-      setIsAddDialogOpen(false)
+      });
+      setIsAddDialogOpen(false);
       toast({
         title: "Job Added",
         description: "New job has been successfully added.",
-      })
+      });
+      refetch();
     }
-  }
+  };
 
   const handleEditJob = (job: Job) => {
-    setEditingJob(job)
+    setEditingJob(job);
     setNewJob({
       title: job.title,
       company: job.company,
@@ -88,26 +110,43 @@ export default function AdminJobsPage() {
       requirements: job.requirements || [],
       benefits: job.benefits || [],
       image_url: job.image_url || "",
-    })
-  }
+    });
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setImageUploading(true);
+    try {
+      // Call your existing Cloudinary upload function here
+      const imageUrl = await uploadFileToCloudinary(file);
+      setNewJob({ ...newJob, image_url: imageUrl });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   const handleUpdateJob = async () => {
-    if (!editingJob) return
+    if (!editingJob) return;
 
     const { error } = await updateJob(editingJob.id, {
       ...newJob,
       requirements: newJob.requirements.filter((req) => req.trim() !== ""),
       benefits: newJob.benefits.filter((benefit) => benefit.trim() !== ""),
-    })
+    });
 
     if (error) {
       toast({
         title: "Error",
         description: "Failed to update job",
         variant: "destructive",
-      })
+      });
     } else {
-      setEditingJob(null)
+      setEditingJob(null);
       setNewJob({
         title: "",
         company: "",
@@ -121,79 +160,88 @@ export default function AdminJobsPage() {
         requirements: [],
         benefits: [],
         image_url: "",
-      })
+      });
       toast({
         title: "Job Updated",
         description: "Job has been successfully updated.",
-      })
+      });
+      refetch();
     }
-  }
+  };
 
   const handleDeleteJob = async (id: number) => {
-    const { error } = await deleteJob(id)
+    const { error } = await deleteJob(id);
 
     if (error) {
       toast({
         title: "Error",
         description: "Failed to delete job",
         variant: "destructive",
-      })
+      });
     } else {
       toast({
         title: "Job Deleted",
         description: "Job has been successfully deleted.",
-      })
+      });
+      refetch();
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
       case "paused":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
       case "closed":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
     }
-  }
+  };
 
   const addRequirement = () => {
-    setNewJob((prev) => ({ ...prev, requirements: [...prev.requirements, ""] }))
-  }
+    setNewJob((prev) => ({
+      ...prev,
+      requirements: [...prev.requirements, ""],
+    }));
+  };
 
   const updateRequirement = (index: number, value: string) => {
     setNewJob((prev) => ({
       ...prev,
-      requirements: prev.requirements.map((req, i) => (i === index ? value : req)),
-    }))
-  }
+      requirements: prev.requirements.map((req, i) =>
+        i === index ? value : req
+      ),
+    }));
+  };
 
   const removeRequirement = (index: number) => {
     setNewJob((prev) => ({
       ...prev,
       requirements: prev.requirements.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const addBenefit = () => {
-    setNewJob((prev) => ({ ...prev, benefits: [...prev.benefits, ""] }))
-  }
+    setNewJob((prev) => ({ ...prev, benefits: [...prev.benefits, ""] }));
+  };
 
   const updateBenefit = (index: number, value: string) => {
     setNewJob((prev) => ({
       ...prev,
-      benefits: prev.benefits.map((benefit, i) => (i === index ? value : benefit)),
-    }))
-  }
+      benefits: prev.benefits.map((benefit, i) =>
+        i === index ? value : benefit
+      ),
+    }));
+  };
 
   const removeBenefit = (index: number) => {
     setNewJob((prev) => ({
       ...prev,
       benefits: prev.benefits.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   if (jobsLoading || categoriesLoading) {
     return (
@@ -241,7 +289,7 @@ export default function AdminJobsPage() {
           </div>
         </div>
       </AdminLayout>
-    )
+    );
   }
 
   return (
@@ -250,7 +298,9 @@ export default function AdminJobsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Job Management</h1>
-            <p className="text-muted-foreground">Manage job postings and track applications</p>
+            <p className="text-muted-foreground">
+              Manage job postings and track applications
+            </p>
           </div>
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -265,13 +315,57 @@ export default function AdminJobsPage() {
                 <DialogTitle>Add New Job</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
+                <div>
+                  <Label>Job Image</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex-shrink-0">
+                      {newJob.image_url ? (
+                        <Image
+                          src={newJob.image_url}
+                          alt="Job preview"
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">
+                            No Image
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={imageUploading}
+                        className="relative overflow-hidden"
+                      >
+                        {imageUploading ? "Uploading..." : "Add Image"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(file);
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                          disabled={imageUploading}
+                        />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="title">Job Title</Label>
                     <Input
                       id="title"
                       value={newJob.title}
-                      onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, title: e.target.value })
+                      }
                       placeholder="e.g. Security Guard"
                     />
                   </div>
@@ -280,7 +374,9 @@ export default function AdminJobsPage() {
                     <Input
                       id="company"
                       value={newJob.company}
-                      onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, company: e.target.value })
+                      }
                       placeholder="e.g. Dubai Security Services"
                     />
                   </div>
@@ -292,7 +388,9 @@ export default function AdminJobsPage() {
                     <Input
                       id="location"
                       value={newJob.location}
-                      onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, location: e.target.value })
+                      }
                       placeholder="e.g. Dubai"
                     />
                   </div>
@@ -301,7 +399,9 @@ export default function AdminJobsPage() {
                     <Input
                       id="country"
                       value={newJob.country}
-                      onChange={(e) => setNewJob({ ...newJob, country: e.target.value })}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, country: e.target.value })
+                      }
                       placeholder="e.g. UAE"
                     />
                   </div>
@@ -313,7 +413,9 @@ export default function AdminJobsPage() {
                     <Input
                       id="salary"
                       value={newJob.salary}
-                      onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, salary: e.target.value })
+                      }
                       placeholder="e.g. $800-1200/month"
                     />
                   </div>
@@ -321,7 +423,9 @@ export default function AdminJobsPage() {
                     <Label htmlFor="type">Job Type</Label>
                     <Select
                       value={newJob.job_type}
-                      onValueChange={(value) => setNewJob({ ...newJob, job_type: value })}
+                      onValueChange={(value) =>
+                        setNewJob({ ...newJob, job_type: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -340,7 +444,9 @@ export default function AdminJobsPage() {
                     <Label htmlFor="category">Category</Label>
                     <Select
                       value={newJob.category}
-                      onValueChange={(value) => setNewJob({ ...newJob, category: value })}
+                      onValueChange={(value) =>
+                        setNewJob({ ...newJob, category: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -356,7 +462,12 @@ export default function AdminJobsPage() {
                   </div>
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select value={newJob.status} onValueChange={(value) => setNewJob({ ...newJob, status: value })}>
+                    <Select
+                      value={newJob.status}
+                      onValueChange={(value) =>
+                        setNewJob({ ...newJob, status: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -370,21 +481,13 @@ export default function AdminJobsPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Job Image URL</Label>
-                  <Input
-                    id="image"
-                    value={newJob.image_url}
-                    onChange={(e) => setNewJob({ ...newJob, image_url: e.target.value })}
-                    placeholder="Image URL or leave empty for default"
-                  />
-                </div>
-
-                <div>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     value={newJob.description}
-                    onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, description: e.target.value })
+                    }
                     placeholder="Job description and requirements..."
                     rows={4}
                   />
@@ -397,15 +500,26 @@ export default function AdminJobsPage() {
                       <div key={index} className="flex gap-2">
                         <Input
                           value={req}
-                          onChange={(e) => updateRequirement(index, e.target.value)}
+                          onChange={(e) =>
+                            updateRequirement(index, e.target.value)
+                          }
                           placeholder="Enter requirement"
                         />
-                        <Button type="button" variant="outline" size="sm" onClick={() => removeRequirement(index)}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeRequirement(index)}
+                        >
                           Remove
                         </Button>
                       </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={addRequirement}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addRequirement}
+                    >
                       Add Requirement
                     </Button>
                   </div>
@@ -421,19 +535,31 @@ export default function AdminJobsPage() {
                           onChange={(e) => updateBenefit(index, e.target.value)}
                           placeholder="Enter benefit"
                         />
-                        <Button type="button" variant="outline" size="sm" onClick={() => removeBenefit(index)}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeBenefit(index)}
+                        >
                           Remove
                         </Button>
                       </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={addBenefit}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addBenefit}
+                    >
                       Add Benefit
                     </Button>
                   </div>
                 </div>
               </div>
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAddDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button onClick={handleAddJob}>Add Job</Button>
@@ -449,7 +575,12 @@ export default function AdminJobsPage() {
               <CardContent className="p-6">
                 <div className="flex gap-6">
                   <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image src={job.image_url || "/placeholder.svg"} alt={job.title} fill className="object-cover" />
+                    <Image
+                      src={job.image_url || "/placeholder.svg"}
+                      alt={job.title}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
 
                   <div className="flex-1">
@@ -458,32 +589,44 @@ export default function AdminJobsPage() {
                         <h3 className="text-xl font-semibold">{job.title}</h3>
                         <p className="text-muted-foreground">{job.company}</p>
                       </div>
-                      <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+                      <Badge className={getStatusColor(job.status)}>
+                        {job.status}
+                      </Badge>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground mb-4">
                       <div>
-                        <span className="font-medium">Location:</span> {job.location}
+                        <span className="font-medium">Location:</span>{" "}
+                        {job.location}
                       </div>
                       <div>
-                        <span className="font-medium">Salary:</span> {job.salary}
+                        <span className="font-medium">Salary:</span>{" "}
+                        {job.salary}
                       </div>
                       <div>
-                        <span className="font-medium">Type:</span> {job.job_type}
+                        <span className="font-medium">Type:</span>{" "}
+                        {job.job_type}
                       </div>
                       <div>
-                        <span className="font-medium">Category:</span> {job.category}
+                        <span className="font-medium">Category:</span>{" "}
+                        {job.category}
                       </div>
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{job.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {job.description}
+                    </p>
 
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
+                      {/* <Button variant="outline" size="sm">
                         <Eye className="h-4 w-4 mr-1" />
                         View
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEditJob(job)}>
+                      </Button> */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditJob(job)}
+                      >
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
                       </Button>
@@ -511,13 +654,55 @@ export default function AdminJobsPage() {
               <DialogTitle>Edit Job</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div>
+                <Label>Job Image</Label>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex-shrink-0">
+                    {newJob.image_url ? (
+                      <Image
+                        src={newJob.image_url}
+                        alt="Job preview"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">No Image</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={imageUploading}
+                      className="relative overflow-hidden"
+                    >
+                      {imageUploading ? "Uploading..." : "Update Image"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        disabled={imageUploading}
+                      />
+                    </Button>
+                  </div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-title">Job Title</Label>
                   <Input
                     id="edit-title"
                     value={newJob.title}
-                    onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, title: e.target.value })
+                    }
                     placeholder="e.g. Security Guard"
                   />
                 </div>
@@ -526,7 +711,9 @@ export default function AdminJobsPage() {
                   <Input
                     id="edit-company"
                     value={newJob.company}
-                    onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, company: e.target.value })
+                    }
                     placeholder="e.g. Dubai Security Services"
                   />
                 </div>
@@ -538,7 +725,9 @@ export default function AdminJobsPage() {
                   <Input
                     id="edit-location"
                     value={newJob.location}
-                    onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, location: e.target.value })
+                    }
                     placeholder="e.g. Dubai"
                   />
                 </div>
@@ -547,7 +736,9 @@ export default function AdminJobsPage() {
                   <Input
                     id="edit-country"
                     value={newJob.country}
-                    onChange={(e) => setNewJob({ ...newJob, country: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, country: e.target.value })
+                    }
                     placeholder="e.g. UAE"
                   />
                 </div>
@@ -559,13 +750,20 @@ export default function AdminJobsPage() {
                   <Input
                     id="edit-salary"
                     value={newJob.salary}
-                    onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, salary: e.target.value })
+                    }
                     placeholder="e.g. $800-1200/month"
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit-type">Job Type</Label>
-                  <Select value={newJob.job_type} onValueChange={(value) => setNewJob({ ...newJob, job_type: value })}>
+                  <Select
+                    value={newJob.job_type}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, job_type: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -581,7 +779,12 @@ export default function AdminJobsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-category">Category</Label>
-                  <Select value={newJob.category} onValueChange={(value) => setNewJob({ ...newJob, category: value })}>
+                  <Select
+                    value={newJob.category}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, category: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -596,7 +799,12 @@ export default function AdminJobsPage() {
                 </div>
                 <div>
                   <Label htmlFor="edit-status">Status</Label>
-                  <Select value={newJob.status} onValueChange={(value) => setNewJob({ ...newJob, status: value })}>
+                  <Select
+                    value={newJob.status}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, status: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -610,21 +818,13 @@ export default function AdminJobsPage() {
               </div>
 
               <div>
-                <Label htmlFor="edit-image">Job Image URL</Label>
-                <Input
-                  id="edit-image"
-                  value={newJob.image_url}
-                  onChange={(e) => setNewJob({ ...newJob, image_url: e.target.value })}
-                  placeholder="Image URL or leave empty for default"
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="edit-description">Description</Label>
                 <Textarea
                   id="edit-description"
                   value={newJob.description}
-                  onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, description: e.target.value })
+                  }
                   placeholder="Job description and requirements..."
                   rows={4}
                 />
@@ -637,15 +837,26 @@ export default function AdminJobsPage() {
                     <div key={index} className="flex gap-2">
                       <Input
                         value={req}
-                        onChange={(e) => updateRequirement(index, e.target.value)}
+                        onChange={(e) =>
+                          updateRequirement(index, e.target.value)
+                        }
                         placeholder="Enter requirement"
                       />
-                      <Button type="button" variant="outline" size="sm" onClick={() => removeRequirement(index)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeRequirement(index)}
+                      >
                         Remove
                       </Button>
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addRequirement}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addRequirement}
+                  >
                     Add Requirement
                   </Button>
                 </div>
@@ -661,7 +872,12 @@ export default function AdminJobsPage() {
                         onChange={(e) => updateBenefit(index, e.target.value)}
                         placeholder="Enter benefit"
                       />
-                      <Button type="button" variant="outline" size="sm" onClick={() => removeBenefit(index)}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeBenefit(index)}
+                      >
                         Remove
                       </Button>
                     </div>
@@ -682,5 +898,5 @@ export default function AdminJobsPage() {
         </Dialog>
       </div>
     </AdminLayout>
-  )
+  );
 }

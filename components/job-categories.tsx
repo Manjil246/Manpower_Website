@@ -1,20 +1,29 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
-import { supabase, type JobCategory } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { supabase, type JobCategory } from "@/lib/supabase";
 
 // Icon mapping
 const iconMap: Record<string, any> = {
   Shield: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -24,7 +33,12 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   Hotel: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -34,18 +48,33 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   Car: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={2}
         d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
       />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 6H5l2 7h10l-2-7z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M13 6H5l2 7h10l-2-7z"
+      />
     </svg>
   ),
   Hammer: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -55,7 +84,12 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   ChefHat: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -65,7 +99,12 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   Building: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -75,7 +114,12 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   Wrench: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -85,7 +129,12 @@ const iconMap: Record<string, any> = {
     </svg>
   ),
   Stethoscope: () => (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -94,42 +143,55 @@ const iconMap: Record<string, any> = {
       />
     </svg>
   ),
-}
+};
 
 export function JobCategories() {
-  const [categories, setCategories] = useState<JobCategory[]>([])
-  const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<JobCategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const { data, error } = await supabase.from("job_categories").select("*").order("job_count", { ascending: false })
+      const { data, error } = await supabase
+        .from("job_categories")
+        .select("*")
+        .order("job_count", { ascending: false });
 
       if (data && !error) {
-        setCategories(data)
+        setCategories(data);
       }
-      setLoading(false)
-    }
+      setLoading(false);
+    };
 
-    fetchCategories()
+    fetchCategories();
 
     // Real-time subscription
     const subscription = supabase
       .channel("job_categories_channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "job_categories" }, (payload) => {
-        if (payload.eventType === "INSERT") {
-          setCategories((prev) => [...prev, payload.new as JobCategory])
-        } else if (payload.eventType === "UPDATE") {
-          setCategories((prev) => prev.map((cat) => (cat.id === payload.new.id ? (payload.new as JobCategory) : cat)))
-        } else if (payload.eventType === "DELETE") {
-          setCategories((prev) => prev.filter((cat) => cat.id !== payload.old.id))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "job_categories" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setCategories((prev) => [...prev, payload.new as JobCategory]);
+          } else if (payload.eventType === "UPDATE") {
+            setCategories((prev) =>
+              prev.map((cat) =>
+                cat.id === payload.new.id ? (payload.new as JobCategory) : cat
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setCategories((prev) =>
+              prev.filter((cat) => cat.id !== payload.old.id)
+            );
+          }
         }
-      })
-      .subscribe()
+      )
+      .subscribe();
 
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -165,7 +227,7 @@ export function JobCategories() {
           </ScrollArea>
         </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -175,16 +237,19 @@ export function JobCategories() {
           <Badge variant="secondary" className="mb-4">
             Job Categories
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Explore Opportunities</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+            Explore Opportunities
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover career opportunities across various industries and find the perfect job that matches your skills.
+            Discover career opportunities across various industries and find the
+            perfect job that matches your skills.
           </p>
         </div>
 
         <ScrollArea className="w-full whitespace-nowrap rounded-md border">
           <div className="flex w-max space-x-4 p-4">
             {categories.map((category) => {
-              const IconComponent = iconMap[category.icon] || iconMap.Building
+              const IconComponent = iconMap[category.icon] || iconMap.Building;
 
               return (
                 <HoverCard key={category.id}>
@@ -197,7 +262,7 @@ export function JobCategories() {
                           >
                             <IconComponent />
                           </div>
-                          <Badge variant="outline">{category.job_count}+ Jobs</Badge>
+                          {/* <Badge variant="outline">{category.job_count}+ Jobs</Badge> */}
                         </div>
                         <CardTitle className="text-xl group-hover:text-primary transition-colors">
                           {category.name}
@@ -233,7 +298,9 @@ export function JobCategories() {
                         </div>
                         <div>
                           <h4 className="font-semibold">{category.name}</h4>
-                          <p className="text-sm text-muted-foreground">{category.job_count}+ Jobs Available</p>
+                          {/* <p className="text-sm text-muted-foreground">
+                            {category.job_count}+ Jobs Available
+                          </p> */}
                         </div>
                       </div>
                       <p className="text-sm">
@@ -242,23 +309,36 @@ export function JobCategories() {
                       </p>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Average Salary:</span>
-                          <span className="font-medium">{category.average_salary || "Competitive"}</span>
+                          <span className="text-muted-foreground">
+                            Average Salary:
+                          </span>
+                          <span className="font-medium">
+                            {category.average_salary || "Competitive"}
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Top Countries:</span>
+                          <span className="text-muted-foreground">
+                            Top Countries:
+                          </span>
                           <span className="font-medium">
-                            {category.top_countries?.join(", ") || "UAE, Qatar, Saudi Arabia"}
+                            {category.top_countries?.join(", ") ||
+                              "UAE, Qatar, Saudi Arabia"}
                           </span>
                         </div>
                       </div>
-                      <Link href={`/jobs?category=${encodeURIComponent(category.name)}`}>
-                        <Button className="w-full mt-3">View {category.name} Jobs</Button>
+                      <Link
+                        href={`/jobs?category=${encodeURIComponent(
+                          category.name
+                        )}`}
+                      >
+                        <Button className="w-full mt-3">
+                          View {category.name} Jobs
+                        </Button>
                       </Link>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
-              )
+              );
             })}
           </div>
           <ScrollBar orientation="horizontal" />
@@ -271,11 +351,11 @@ export function JobCategories() {
               className="bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900"
             >
               View All Categories
-              <ArrowRight className="ml-2 h-4 w-4" />
+              {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
             </Button>
           </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }
